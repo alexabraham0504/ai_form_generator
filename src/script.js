@@ -24,7 +24,7 @@ export class FormGenerator {
         try {
             this.bindEvents();
             console.log('Events bound successfully');
-            this.addQuestion(); // Add first question by default
+            this.addManualQuestion(); // Add first question by default
             console.log('First question added');
             this.initDragAndDrop(); // Initialize drag and drop functionality
             console.log('Drag and drop initialized');
@@ -156,6 +156,42 @@ export class FormGenerator {
         // Generate form button
         document.getElementById('generateFormBtn').addEventListener('click', () => {
             this.generateForm();
+        });
+
+        // Generate synthetic responses button
+        document.getElementById('generateResponsesBtn').addEventListener('click', () => {
+            this.showSentimentModal();
+        });
+
+        // Sentiment modal controls
+        document.getElementById('closeSentimentModal').addEventListener('click', () => {
+            this.hideSentimentModal();
+        });
+
+        document.getElementById('cancelSentimentModal').addEventListener('click', () => {
+            this.hideSentimentModal();
+        });
+
+        document.getElementById('generateSyntheticResponses').addEventListener('click', () => {
+            this.generateSyntheticResponses();
+        });
+
+        // Close responses results
+        document.getElementById('closeResponsesResults').addEventListener('click', () => {
+            this.hideResponsesResults();
+        });
+
+        // Sentiment slider controls
+        document.getElementById('positivePercent').addEventListener('input', (e) => {
+            this.updateSentimentSliders('positive', e.target.value);
+        });
+
+        document.getElementById('neutralPercent').addEventListener('input', (e) => {
+            this.updateSentimentSliders('neutral', e.target.value);
+        });
+
+        document.getElementById('negativePercent').addEventListener('input', (e) => {
+            this.updateSentimentSliders('negative', e.target.value);
         });
 
         // Settings functionality removed - configuration is managed via environment variables
@@ -1182,6 +1218,317 @@ export class FormGenerator {
             addMoreBtn.innerHTML = originalText;
             addMoreBtn.disabled = false;
         }
+    }
+
+    // Show sentiment configuration modal
+    showSentimentModal() {
+        const formData = this.collectFormData();
+        if (formData.questions.length === 0) {
+            Swal.fire('No Questions', 'Please add some questions to your form before generating synthetic responses.', 'warning');
+            return;
+        }
+        
+        document.getElementById('sentimentModal').classList.remove('hidden');
+        this.resetSentimentSliders();
+    }
+
+    // Hide sentiment configuration modal
+    hideSentimentModal() {
+        document.getElementById('sentimentModal').classList.add('hidden');
+    }
+
+    // Reset sentiment sliders to default values
+    resetSentimentSliders() {
+        document.getElementById('positivePercent').value = 70;
+        document.getElementById('neutralPercent').value = 20;
+        document.getElementById('negativePercent').value = 10;
+        this.updateSentimentDisplay();
+    }
+
+    // Update sentiment sliders and ensure they total 100%
+    updateSentimentSliders(changedType, value) {
+        const positive = parseInt(document.getElementById('positivePercent').value);
+        const neutral = parseInt(document.getElementById('neutralPercent').value);
+        const negative = parseInt(document.getElementById('negativePercent').value);
+        
+        let total = positive + neutral + negative;
+        
+        // Adjust other sliders to maintain 100% total
+        if (changedType === 'positive') {
+            const remaining = 100 - value;
+            if (remaining >= 0) {
+                const neutralRatio = neutral / (neutral + negative);
+                const negativeRatio = negative / (neutral + negative);
+                document.getElementById('neutralPercent').value = Math.round(remaining * neutralRatio);
+                document.getElementById('negativePercent').value = Math.round(remaining * negativeRatio);
+            }
+        } else if (changedType === 'neutral') {
+            const remaining = 100 - value;
+            if (remaining >= 0) {
+                const positiveRatio = positive / (positive + negative);
+                const negativeRatio = negative / (positive + negative);
+                document.getElementById('positivePercent').value = Math.round(remaining * positiveRatio);
+                document.getElementById('negativePercent').value = Math.round(remaining * negativeRatio);
+            }
+        } else if (changedType === 'negative') {
+            const remaining = 100 - value;
+            if (remaining >= 0) {
+                const positiveRatio = positive / (positive + neutral);
+                const neutralRatio = neutral / (positive + neutral);
+                document.getElementById('positivePercent').value = Math.round(remaining * positiveRatio);
+                document.getElementById('neutralPercent').value = Math.round(remaining * neutralRatio);
+            }
+        }
+        
+        this.updateSentimentDisplay();
+    }
+
+    // Update sentiment display values
+    updateSentimentDisplay() {
+        const positive = document.getElementById('positivePercent').value;
+        const neutral = document.getElementById('neutralPercent').value;
+        const negative = document.getElementById('negativePercent').value;
+        const total = parseInt(positive) + parseInt(neutral) + parseInt(negative);
+        
+        document.getElementById('positiveValue').textContent = positive + '%';
+        document.getElementById('neutralValue').textContent = neutral + '%';
+        document.getElementById('negativeValue').textContent = negative + '%';
+        document.getElementById('totalPercent').textContent = total + '%';
+    }
+
+    // Generate synthetic responses based on sentiment configuration
+    generateSyntheticResponses() {
+        const positive = parseInt(document.getElementById('positivePercent').value);
+        const neutral = parseInt(document.getElementById('neutralPercent').value);
+        const negative = parseInt(document.getElementById('negativePercent').value);
+        
+        if (positive + neutral + negative !== 100) {
+            Swal.fire('Invalid Configuration', 'Sentiment percentages must total 100%.', 'error');
+            return;
+        }
+
+        const formData = this.collectFormData();
+        const numResponses = 5; // Generate 5 synthetic responses (ultra fast)
+        
+        // Generate responses instantly without loading screen
+        const responses = this.generateResponsesLocally(formData, numResponses, { positive, neutral, negative });
+        
+        this.hideSentimentModal();
+        this.showResponsesResults(responses, formData);
+    }
+
+    // Generate responses using AI
+    async generateResponsesWithAI(formData, numResponses, sentimentConfig) {
+        const prompt = this.buildResponseGenerationPrompt(formData, numResponses, sentimentConfig);
+        
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${this.geminiApiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                const generatedText = data.candidates[0].content.parts[0].text.trim();
+                
+                try {
+                    const responses = JSON.parse(generatedText);
+                    return responses;
+                } catch (parseError) {
+                    console.warn('AI response parsing failed, using local generation:', parseError);
+                    return this.generateResponsesLocally(formData, numResponses, sentimentConfig);
+                }
+            } else {
+                throw new Error('Invalid response from Gemini API');
+            }
+        } catch (error) {
+            // Fallback to local generation if API fails
+            console.warn('API failed, using local generation:', error);
+            return this.generateResponsesLocally(formData, numResponses, sentimentConfig);
+        }
+    }
+
+    // Build prompt for AI response generation
+    buildResponseGenerationPrompt(formData, numResponses, sentimentConfig) {
+        const { positive, neutral, negative } = sentimentConfig;
+        
+        return `Generate ${numResponses} synthetic responses to a form with the following specifications:
+
+Form Title: ${formData.title}
+Form Description: ${formData.description}
+
+Questions:
+${formData.questions.map((q, i) => `${i + 1}. ${q.title} (Type: ${q.type})${q.options ? `\n   Options: ${q.options.join(', ')}` : ''}`).join('\n')}
+
+Sentiment Distribution:
+- ${positive}% Positive responses
+- ${neutral}% Neutral responses  
+- ${negative}% Negative responses
+
+Generate realistic responses that match the sentiment distribution. For each response, provide answers that are contextually appropriate to the question type and maintain the specified sentiment ratio.
+
+Return the responses as a JSON array where each response is an object with question numbers as keys and answers as values.`;
+    }
+
+    // Local fallback response generation (ultra optimized for speed)
+    generateResponsesLocally(formData, numResponses, sentimentConfig) {
+        const responses = [];
+        const { positive, neutral, negative } = sentimentConfig;
+        
+        // Generate responses with minimal processing
+        for (let i = 0; i < numResponses; i++) {
+            const response = {};
+            const sentiment = this.getRandomSentiment(positive, neutral, negative);
+            
+            formData.questions.forEach((question, index) => {
+                response[`Question ${index + 1}`] = this.generateLocalResponse(question, sentiment);
+            });
+            
+            responses.push(response);
+        }
+        
+        return responses;
+    }
+
+    // Get random sentiment based on distribution
+    getRandomSentiment(positive, neutral, negative) {
+        const rand = Math.random() * 100;
+        if (rand < positive) return 'positive';
+        if (rand < positive + neutral) return 'neutral';
+        return 'negative';
+    }
+
+    // Generate local response based on question type and sentiment (ultra fast)
+    generateLocalResponse(question, sentiment) {
+        const { type, options } = question;
+        
+        switch (type) {
+            case 'short_answer':
+            case 'paragraph':
+                return sentiment === 'positive' ? 'Great' : sentiment === 'negative' ? 'Poor' : 'Okay';
+            case 'multiple_choice':
+            case 'dropdown':
+            case 'checkboxes':
+                return options && options.length > 0 ? options[0] : 'Option 1';
+            default:
+                return 'Response';
+        }
+    }
+
+    // Generate short answer based on sentiment
+    generateShortAnswer(sentiment) {
+        const responses = {
+            positive: ['Excellent!', 'Great experience', 'Very satisfied', 'Outstanding', 'Amazing'],
+            neutral: ['Okay', 'Average', 'Fine', 'Acceptable', 'Standard'],
+            negative: ['Disappointing', 'Poor quality', 'Not satisfied', 'Below average', 'Needs improvement']
+        };
+        const options = responses[sentiment] || responses.neutral;
+        return options[Math.floor(Math.random() * options.length)];
+    }
+
+    // Generate paragraph based on sentiment
+    generateParagraph(sentiment) {
+        const responses = {
+            positive: [
+                'I had an absolutely wonderful experience with this. Everything exceeded my expectations and I would highly recommend it to others.',
+                'This was fantastic! The quality and service were outstanding. I am very satisfied with the results.',
+                'Excellent experience overall. The attention to detail and professionalism were impressive.'
+            ],
+            neutral: [
+                'The experience was okay. It met my basic expectations but nothing particularly stood out.',
+                'It was an average experience. Adequate but not exceptional in any way.',
+                'The service was acceptable and fulfilled the basic requirements.'
+            ],
+            negative: [
+                'I was quite disappointed with this experience. The quality was below what I expected.',
+                'This did not meet my expectations at all. The service was poor and I would not recommend it.',
+                'Very unsatisfied with the overall experience. There were several issues that need to be addressed.'
+            ]
+        };
+        const options = responses[sentiment] || responses.neutral;
+        return options[Math.floor(Math.random() * options.length)];
+    }
+
+    // Show responses results
+    showResponsesResults(responses, formData) {
+        const downloadSection = document.getElementById('responsesDownloadSection');
+        downloadSection.innerHTML = '';
+        
+        // Create CSV download button
+        const csvButton = document.createElement('button');
+        csvButton.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center';
+        csvButton.innerHTML = '<i class="fas fa-download mr-2"></i>Download Responses (CSV)';
+        csvButton.onclick = () => this.downloadResponsesCSV(responses, formData);
+        
+        // Create JSON download button
+        const jsonButton = document.createElement('button');
+        jsonButton.className = 'w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center';
+        jsonButton.innerHTML = '<i class="fas fa-code mr-2"></i>Download Responses (JSON)';
+        jsonButton.onclick = () => this.downloadResponsesJSON(responses, formData);
+        
+        downloadSection.appendChild(csvButton);
+        downloadSection.appendChild(jsonButton);
+        
+        document.getElementById('responsesResults').classList.remove('hidden');
+    }
+
+    // Hide responses results
+    hideResponsesResults() {
+        document.getElementById('responsesResults').classList.add('hidden');
+    }
+
+    // Download responses as CSV
+    downloadResponsesCSV(responses, formData) {
+        const headers = ['Response #', ...formData.questions.map((q, i) => `Question ${i + 1}: ${q.title}`)];
+        const csvContent = [
+            headers.join(','),
+            ...responses.map((response, index) => {
+                const row = [index + 1];
+                formData.questions.forEach((_, i) => {
+                    const answer = response[`Question ${i + 1}`] || '';
+                    row.push(`"${answer.replace(/"/g, '""')}"`);
+                });
+                return row.join(',');
+            })
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${formData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_synthetic_responses.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    // Download responses as JSON
+    downloadResponsesJSON(responses, formData) {
+        const data = {
+            formTitle: formData.title,
+            formDescription: formData.description,
+            questions: formData.questions,
+            responses: responses,
+            generatedAt: new Date().toISOString(),
+            totalResponses: responses.length
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${formData.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_synthetic_responses.json`;
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
 }
 

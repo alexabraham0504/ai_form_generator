@@ -149,10 +149,102 @@
 
         <!-- Action Buttons -->
         <div class="mt-6 bg-white rounded-xl shadow-lg p-6">
-            <button id="generateFormBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center">
-                <i class="fas fa-magic mr-2"></i>
-                Generate Google Form
-            </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="generateFormBtn" class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center">
+                    <i class="fas fa-magic mr-2"></i>
+                    Generate Google Form
+                </button>
+                <button id="generateResponsesBtn" class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center">
+                    <i class="fas fa-users mr-2"></i>
+                    Generate Synthetic Responses
+                </button>
+            </div>
+        </div>
+
+        <!-- Sentiment Configuration Modal -->
+        <div id="sentimentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+            <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">Configure Response Sentiment</h3>
+                    <button id="closeSentimentModal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-4">Set the distribution of response sentiments for synthetic data generation.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Positive Responses (%)</label>
+                        <input type="range" id="positivePercent" min="0" max="100" value="70" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0%</span>
+                            <span id="positiveValue">70%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Neutral Responses (%)</label>
+                        <input type="range" id="neutralPercent" min="0" max="100" value="20" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0%</span>
+                            <span id="neutralValue">20%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Negative Responses (%)</label>
+                        <input type="range" id="negativePercent" min="0" max="100" value="10" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>0%</span>
+                            <span id="negativeValue">10%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                            <span class="text-sm text-blue-800">Total: <span id="totalPercent">100%</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button id="generateSyntheticResponses" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
+                        Generate Responses
+                    </button>
+                    <button id="cancelSentimentModal" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Synthetic Responses Results -->
+        <div id="responsesResults" class="mt-6 bg-white rounded-xl shadow-lg p-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-900">Synthetic Responses Generated</h3>
+                <button id="closeResponsesResults" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-600 text-xl mr-3"></i>
+                    <div>
+                        <p class="text-green-800 font-medium">Responses generated successfully!</p>
+                        <p class="text-green-700 text-sm">Download the CSV file below to view the synthetic responses.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="responsesDownloadSection" class="space-y-3">
+                <!-- Download buttons will be added here -->
+            </div>
         </div>
 
         <!-- Generated Form Link -->
