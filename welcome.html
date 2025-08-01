@@ -314,7 +314,11 @@
             // Navigate to the main app
             // Check if we're in development or production
             const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isRender = window.location.hostname.includes('onrender.com');
             const appUrl = isDevelopment ? '/' : '/app';
+            console.log('Current hostname:', window.location.hostname);
+            console.log('isDevelopment:', isDevelopment);
+            console.log('isRender:', isRender);
             console.log('Navigating to:', appUrl);
             window.location.href = appUrl;
         }

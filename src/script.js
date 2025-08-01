@@ -874,7 +874,12 @@ export class FormGenerator {
                 // Navigate to welcome page
                 // Check if we're in development or production
                 const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const isRender = window.location.hostname.includes('onrender.com');
                 const welcomeUrl = isDevelopment ? '/welcome.html' : '/';
+                console.log('goBackToWelcome - Current hostname:', window.location.hostname);
+                console.log('goBackToWelcome - isDevelopment:', isDevelopment);
+                console.log('goBackToWelcome - isRender:', isRender);
+                console.log('goBackToWelcome - Navigating to:', welcomeUrl);
                 window.location.href = welcomeUrl;
             }
         });
