@@ -1,7 +1,6 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { createServer as createViteServer } from 'vite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -9,10 +8,30 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Serve static files from dist directory
 app.use(express.static(join(__dirname, 'dist')));
 
-// Handle all routes by serving index.html (for SPA routing)
+// Serve welcome.html at root path
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'welcome.html'));
+});
+
+// Serve welcome.html at /welcome.html path
+app.get('/welcome.html', (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'welcome.html'));
+});
+
+// Handle all other routes by serving index.html (for SPA routing)
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
