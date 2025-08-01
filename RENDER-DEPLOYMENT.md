@@ -56,7 +56,7 @@ This guide will help you deploy your AI-Powered Form Generator to Render while k
 
    **Build & Deploy Settings:**
    - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm run preview`
+   - **Start Command**: `npm start` (or `npm run preview` as alternative)
    - **Root Directory**: Leave empty (or `./` if needed)
 
 ### Step 4: Configure Environment Variables
