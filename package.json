@@ -4,10 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server.js",
     "build": "node build.js",
-    "build:vite": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port $PORT",
     "start": "node server.js",
     "deploy": "npm run build && echo 'Build complete! Deploy the dist folder to your hosting service.'"
   },

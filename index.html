@@ -208,50 +208,11 @@
 
     <script type="module" src="/src/main.js"></script>
     <script>
-        // Check if user has seen welcome page
+        // Main form page loaded at /app path
         window.addEventListener('load', function() {
-            console.log('Page loaded, checking welcome status...');
-            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-            console.log('hasSeenWelcome:', hasSeenWelcome);
+            console.log('Main form page loaded at /app');
             console.log('Current URL:', window.location.href);
             console.log('Current pathname:', window.location.pathname);
-            
-            // Check if we're in development or production
-            const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const isRender = window.location.hostname.includes('onrender.com');
-            const currentPath = window.location.pathname;
-            
-            console.log('Current hostname:', window.location.hostname);
-            console.log('isDevelopment:', isDevelopment);
-            console.log('isRender:', isRender);
-            console.log('Current path:', currentPath);
-            
-            // Prevent infinite redirects
-            const redirectCount = parseInt(sessionStorage.getItem('redirectCount') || '0');
-            if (redirectCount > 3) {
-                console.error('Too many redirects, stopping to prevent infinite loop');
-                sessionStorage.removeItem('redirectCount');
-                return;
-            }
-            
-            if (hasSeenWelcome !== 'true') {
-                // Redirect to welcome page if not seen
-                const welcomeUrl = isDevelopment ? '/welcome.html' : '/';
-                console.log('Redirecting to welcome page:', welcomeUrl);
-                sessionStorage.setItem('redirectCount', (redirectCount + 1).toString());
-                window.location.href = welcomeUrl;
-            } else {
-                console.log('User has seen welcome page, staying on current page');
-                sessionStorage.removeItem('redirectCount'); // Reset counter
-                
-                // Additional check: if we're on Render and at root path but user has seen welcome,
-                // we should redirect to /app
-                if (isRender && currentPath === '/') {
-                    console.log('On Render at root path with welcome seen, redirecting to /app');
-                    sessionStorage.setItem('redirectCount', (redirectCount + 1).toString());
-                    window.location.href = '/app';
-                }
-            }
         });
     </script>
 </body>

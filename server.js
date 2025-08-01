@@ -18,27 +18,39 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Serve static files from dist directory
-app.use(express.static(join(__dirname, 'dist')));
+
 
 // Serve welcome.html at root path
 app.get('/', (req, res) => {
+  console.log('Root path requested, serving welcome.html');
   res.sendFile(join(__dirname, 'dist', 'welcome.html'));
 });
 
 // Serve welcome.html at /welcome.html path
 app.get('/welcome.html', (req, res) => {
+  console.log('Welcome path requested, serving welcome.html');
   res.sendFile(join(__dirname, 'dist', 'welcome.html'));
 });
 
-// Serve index.html at /app path
+// Serve index.html at /app path (main form page)
 app.get('/app', (req, res) => {
+  console.log('App path requested, serving index.html');
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
-// Handle all other routes by serving index.html (for SPA routing)
-app.get('*', (req, res) => {
+// Serve index.html at /index.html path (main form page) - for direct access
+app.get('/index.html', (req, res) => {
+  console.log('Index.html path requested, serving index.html');
   res.sendFile(join(__dirname, 'dist', 'index.html'));
+});
+
+// Serve static assets (CSS, JS, images) but NOT HTML files
+app.use('/assets', express.static(join(__dirname, 'dist', 'assets')));
+
+// Handle all other routes by serving welcome.html
+app.get('*', (req, res) => {
+  console.log('Wildcard path requested:', req.path, 'serving welcome.html');
+  res.sendFile(join(__dirname, 'dist', 'welcome.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {

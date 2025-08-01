@@ -59,10 +59,10 @@
                 manages form structure, and creates beautiful surveys tailored to your needs.
             </p>
             <div class="flex justify-center space-x-4">
-                <button onclick="enterApp()" class="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors">
-                    <i class="fas fa-rocket mr-2"></i>
-                    Start Creating
-                </button>
+                            <button onclick="enterApp()" class="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition-colors">
+                <i class="fas fa-rocket mr-2"></i>
+                Start Creating
+            </button>
                 <button onclick="scrollToFeatures()" class="border-2 border-white text-white hover:bg-white hover:text-indigo-600 px-8 py-3 rounded-lg font-semibold transition-colors">
                     <i class="fas fa-info-circle mr-2"></i>
                     Learn More
@@ -311,17 +311,13 @@
             // Store that user has seen the welcome page
             localStorage.setItem('hasSeenWelcome', 'true');
             console.log('hasSeenWelcome set to true');
-            // Navigate to the main app
-            // Check if we're in development or production
-            const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const isRender = window.location.hostname.includes('onrender.com');
-            const appUrl = isDevelopment ? '/' : '/app';
-            console.log('Current hostname:', window.location.hostname);
-            console.log('isDevelopment:', isDevelopment);
-            console.log('isRender:', isRender);
-            console.log('Navigating to:', appUrl);
-            window.location.href = appUrl;
+            
+            // Navigate to main form page
+            console.log('Navigating to /app');
+            window.location.href = '/app';
         }
+
+
 
         function scrollToFeatures() {
             document.getElementById('features').scrollIntoView({ 
