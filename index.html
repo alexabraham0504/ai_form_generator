@@ -71,56 +71,88 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Form Builder Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <!-- Form Title Section -->
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Form Title</label>
-                <div class="flex gap-2">
-                    <input type="text" id="formTitle" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your form title..." value="AI-Generated Form">
-                    <button id="generateQuestionsBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
-                        <i class="fas fa-robot mr-2"></i>
-                        Generate Questions
-                    </button>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">Enter a title and click "Generate Questions" to create AI-powered questions</p>
+        <!-- Form Title Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Form Title</label>
+            <div class="flex gap-2">
+                <input type="text" id="formTitle" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your form title..." value="AI-Generated Form">
+                <button id="generateQuestionsBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                    <i class="fas fa-robot mr-2"></i>
+                    Generate Questions
+                </button>
             </div>
-            
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-semibold text-gray-900">Build Your Form</h2>
-                <div class="flex gap-2">
-                    <button id="addMoreQuestionsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors flex items-center">
-                        <i class="fas fa-plus mr-1"></i>
-                        Add More
-                    </button>
+            <p class="text-xs text-gray-500 mt-1">Enter a title and click "Generate Questions" to create AI-powered questions</p>
+        </div>
+
+        <!-- Split Screen Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left Side: Manual Question Builder -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-edit mr-2 text-green-600"></i>
+                        Manual Question Builder
+                    </h2>
                     <button id="addQuestionBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
                         <i class="fas fa-plus mr-2"></i>
                         Add Question
                     </button>
                 </div>
+                <p class="text-sm text-gray-600 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Build questions manually and add them to your form
+                </p>
+                
+                <!-- Manual Questions Container -->
+                <div id="manualQuestionsContainer" class="space-y-4 min-h-[400px] border-2 border-dashed border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-edit text-3xl mb-2"></i>
+                        <p>Manual questions will appear here</p>
+                        <p class="text-sm">Click "Add Question" to start building</p>
+                    </div>
+                </div>
             </div>
-            <p class="text-sm text-gray-600 mb-4 flex items-center">
-                <i class="fas fa-info-circle mr-2"></i>
-                Drag questions using the grip handle to reorder them
-            </p>
 
-            <!-- Questions Container -->
-            <div id="questionsContainer" class="space-y-6">
-                <!-- Questions will be dynamically added here -->
+            <!-- Right Side: Generated Questions -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-list-ul mr-2 text-blue-600"></i>
+                        Generated Questions
+                    </h2>
+                    <div class="flex gap-2">
+                        <button id="shuffleQuestionsBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm transition-colors flex items-center">
+                            <i class="fas fa-random mr-1"></i>
+                            Shuffle
+                        </button>
+                        <button id="addMoreQuestionsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors flex items-center">
+                            <i class="fas fa-plus mr-1"></i>
+                            Add More
+                        </button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Drag questions to reorder them
+                </p>
+                
+                <!-- Generated Questions Container -->
+                <div id="generatedQuestionsContainer" class="space-y-4 min-h-[400px] border-2 border-dashed border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fas fa-robot text-3xl mb-2"></i>
+                        <p>Generated questions will appear here</p>
+                        <p class="text-sm">Click "Generate Questions" to start</p>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <!-- Action Buttons -->
-            <div class="mt-8 pt-6 border-t border-gray-200 space-y-3">
-                <button id="generateFormBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center">
-                    <i class="fas fa-magic mr-2"></i>
-                    Generate Google Form
-                </button>
-                <!-- Export Form Data button disabled -->
-                <!-- <button id="exportFormBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg font-medium transition-colors flex items-center justify-center">
-                    <i class="fas fa-download mr-2"></i>
-                    Export Form Data (JSON)
-                </button> -->
-            </div>
+        <!-- Action Buttons -->
+        <div class="mt-6 bg-white rounded-xl shadow-lg p-6">
+            <button id="generateFormBtn" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center">
+                <i class="fas fa-magic mr-2"></i>
+                Generate Google Form
+            </button>
         </div>
 
         <!-- Generated Form Link -->

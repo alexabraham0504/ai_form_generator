@@ -5,7 +5,7 @@ import { FormGenerator } from './script.js';
 document.addEventListener('DOMContentLoaded', () => {
     try {
         console.log('Initializing FormGenerator...');
-        new FormGenerator();
+    new FormGenerator();
         console.log('FormGenerator initialized successfully');
     } catch (error) {
         console.error('Error initializing FormGenerator:', error);

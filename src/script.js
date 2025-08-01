@@ -36,10 +36,11 @@ export class FormGenerator {
 
     // Initialize drag and drop functionality
     initDragAndDrop() {
-        const questionsContainer = document.getElementById('questionsContainer');
+        const generatedContainer = document.getElementById('generatedQuestionsContainer');
+        const manualContainer = document.getElementById('manualQuestionsContainer');
         
-        // Add drag and drop event listeners
-        questionsContainer.addEventListener('dragstart', (e) => {
+        // Add drag and drop event listeners for generated questions
+        generatedContainer.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('question-item')) {
                 e.target.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
@@ -47,28 +48,63 @@ export class FormGenerator {
             }
         });
 
-        questionsContainer.addEventListener('dragend', (e) => {
+        generatedContainer.addEventListener('dragend', (e) => {
             if (e.target.classList.contains('question-item')) {
                 e.target.classList.remove('dragging');
             }
         });
 
-        questionsContainer.addEventListener('dragover', (e) => {
+        generatedContainer.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
             
             const draggingElement = document.querySelector('.dragging');
             if (!draggingElement) return;
 
-            const afterElement = this.getDragAfterElement(questionsContainer, e.clientY);
+            const afterElement = this.getDragAfterElement(generatedContainer, e.clientY);
             if (afterElement) {
-                questionsContainer.insertBefore(draggingElement, afterElement);
+                generatedContainer.insertBefore(draggingElement, afterElement);
             } else {
-                questionsContainer.appendChild(draggingElement);
+                generatedContainer.appendChild(draggingElement);
             }
         });
 
-        questionsContainer.addEventListener('drop', (e) => {
+        generatedContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.updateQuestionNumbers();
+        });
+
+        // Add drag and drop event listeners for manual questions
+        manualContainer.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('question-item')) {
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', e.target.outerHTML);
+            }
+        });
+
+        manualContainer.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('question-item')) {
+                e.target.classList.remove('dragging');
+            }
+        });
+
+        manualContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const draggingElement = document.querySelector('.dragging');
+            if (!draggingElement) return;
+
+            const afterElement = this.getDragAfterElement(manualContainer, e.clientY);
+            if (afterElement) {
+                manualContainer.insertBefore(draggingElement, afterElement);
+            } else {
+                manualContainer.appendChild(draggingElement);
+            }
+        });
+
+        manualContainer.addEventListener('drop', (e) => {
             e.preventDefault();
             this.updateQuestionNumbers();
         });
@@ -92,9 +128,9 @@ export class FormGenerator {
 
     // Bind all event listeners
     bindEvents() {
-        // Add question button
+        // Add question button (manual builder)
         document.getElementById('addQuestionBtn').addEventListener('click', () => {
-            this.addQuestion();
+            this.addManualQuestion();
         });
 
         // Generate questions button
@@ -105,6 +141,11 @@ export class FormGenerator {
         // Add more questions button
         document.getElementById('addMoreQuestionsBtn').addEventListener('click', () => {
             this.addMoreQuestions();
+        });
+
+        // Shuffle questions button
+        document.getElementById('shuffleQuestionsBtn').addEventListener('click', () => {
+            this.shuffleGeneratedQuestions();
         });
 
         // Back to welcome button
@@ -285,8 +326,8 @@ export class FormGenerator {
         };
     }
 
-    // Add a new question to the form
-    addQuestion() {
+    // Add a new manual question to the builder
+    addManualQuestion() {
         this.questionCounter++;
         const template = document.getElementById('questionTemplate');
         const questionElement = template.content.cloneNode(true);
@@ -306,11 +347,83 @@ export class FormGenerator {
         dragHandle.title = 'Drag to reorder';
         questionDiv.appendChild(dragHandle);
         
-        // Add to container
-        document.getElementById('questionsContainer').appendChild(questionElement);
+        // Add "Add to Form" button
+        const addToFormBtn = document.createElement('button');
+        addToFormBtn.className = 'add-to-form-btn bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors flex items-center mt-3';
+        addToFormBtn.innerHTML = '<i class="fas fa-arrow-right mr-1"></i>Add to Form';
+        addToFormBtn.onclick = () => this.addToGeneratedQuestions(questionDiv);
+        questionDiv.appendChild(addToFormBtn);
+        
+        // Add to manual container
+        const manualContainer = document.getElementById('manualQuestionsContainer');
+        
+        // Remove placeholder if exists
+        const placeholder = manualContainer.querySelector('.text-center');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        
+        manualContainer.appendChild(questionElement);
         
         // Update question numbers
         this.updateQuestionNumbers();
+    }
+
+    // Add manual question to generated questions (left to right)
+    addToGeneratedQuestions(questionElement) {
+        // Clone the question element
+        const clonedQuestion = questionElement.cloneNode(true);
+        
+        // Remove the "Add to Form" button
+        const addToFormBtn = clonedQuestion.querySelector('.add-to-form-btn');
+        if (addToFormBtn) {
+            addToFormBtn.remove();
+        }
+        
+        // Add to generated questions container (right side)
+        const generatedContainer = document.getElementById('generatedQuestionsContainer');
+        
+        // Remove placeholder if exists
+        const placeholder = generatedContainer.querySelector('.text-center');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        
+        generatedContainer.appendChild(clonedQuestion);
+        
+        // Remove from manual container (left side)
+        questionElement.remove();
+        
+        // Show success message
+        Swal.fire({
+            title: 'Question Added!',
+            text: 'Question has been moved to the generated questions',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    }
+
+    // Shuffle generated questions
+    shuffleGeneratedQuestions() {
+        const container = document.getElementById('generatedQuestionsContainer');
+        const questions = Array.from(container.children).filter(child => child.classList.contains('question-item'));
+        
+        if (questions.length < 2) {
+            Swal.fire('Info', 'Need at least 2 questions to shuffle', 'info');
+            return;
+        }
+
+        // Fisher-Yates shuffle algorithm
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            container.appendChild(questions[j]);
+        }
+
+        // Update question numbers
+        this.updateQuestionNumbers();
+        
+        Swal.fire('Success!', 'Questions shuffled successfully', 'success');
     }
 
     // Remove a question from the form
@@ -332,11 +445,22 @@ export class FormGenerator {
 
     // Update question numbers after adding/removing questions
     updateQuestionNumbers() {
-        const questions = document.querySelectorAll('.question-item');
-        questions.forEach((question, index) => {
+        const generatedContainer = document.getElementById('generatedQuestionsContainer');
+        const generatedQuestions = generatedContainer.querySelectorAll('.question-item');
+        const manualContainer = document.getElementById('manualQuestionsContainer');
+        const manualQuestions = manualContainer.querySelectorAll('.question-item');
+        
+        // Update generated questions numbers
+        generatedQuestions.forEach((question, index) => {
             question.querySelector('.question-number').textContent = index + 1;
         });
-        this.questionCounter = questions.length;
+        
+        // Update manual questions numbers
+        manualQuestions.forEach((question, index) => {
+            question.querySelector('.question-number').textContent = index + 1;
+        });
+        
+        this.questionCounter = generatedQuestions.length + manualQuestions.length;
     }
 
     // Handle question type change (show/hide options section)
@@ -475,7 +599,8 @@ export class FormGenerator {
     // Collect all form data
     collectFormData() {
         const questions = [];
-        const questionElements = document.querySelectorAll('.question-item');
+        const generatedContainer = document.getElementById('generatedQuestionsContainer');
+        const questionElements = generatedContainer.querySelectorAll('.question-item');
         
         questionElements.forEach((questionElement, index) => {
             const title = questionElement.querySelector('.question-title').value.trim();
@@ -757,7 +882,7 @@ export class FormGenerator {
                     const questions = JSON.parse(generatedText);
                     
                     // Clear existing questions
-                    document.getElementById('questionsContainer').innerHTML = '';
+                    document.getElementById('generatedQuestionsContainer').innerHTML = '';
                     
                     // Add generated questions
                     questions.forEach(questionData => {
@@ -793,7 +918,7 @@ export class FormGenerator {
                 const questions = JSON.parse(jsonMatch[0]);
                 if (Array.isArray(questions) && questions.length > 0) {
                     // Clear existing questions
-                    document.getElementById('questionsContainer').innerHTML = '';
+                    document.getElementById('generatedQuestionsContainer').innerHTML = '';
                     
                     // Add parsed questions
                     questions.forEach(questionData => {
@@ -832,7 +957,7 @@ export class FormGenerator {
 
         if (questions.length > 0) {
             // Clear existing questions
-            document.getElementById('questionsContainer').innerHTML = '';
+            document.getElementById('generatedQuestionsContainer').innerHTML = '';
             
             // Add parsed questions
             questions.slice(0, 5).forEach(questionData => {
@@ -845,7 +970,7 @@ export class FormGenerator {
             const defaultQuestions = this.generateDefaultQuestions(formTitle);
             
             // Clear existing questions
-            document.getElementById('questionsContainer').innerHTML = '';
+            document.getElementById('generatedQuestionsContainer').innerHTML = '';
             
             // Add default questions
             defaultQuestions.forEach(questionData => {
@@ -910,7 +1035,7 @@ export class FormGenerator {
         }
     }
 
-    // Add question with predefined data
+    // Add question with predefined data (for AI-generated questions)
     addQuestionWithData(questionData) {
         this.questionCounter++;
         const template = document.getElementById('questionTemplate');
@@ -947,8 +1072,16 @@ export class FormGenerator {
         dragHandle.title = 'Drag to reorder';
         questionDiv.appendChild(dragHandle);
         
-        // Add to container
-        document.getElementById('questionsContainer').appendChild(questionElement);
+        // Add to generated questions container
+        const generatedContainer = document.getElementById('generatedQuestionsContainer');
+        
+        // Remove placeholder if exists
+        const placeholder = generatedContainer.querySelector('.text-center');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        
+        generatedContainer.appendChild(questionElement);
     }
 
 
