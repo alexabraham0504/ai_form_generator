@@ -307,10 +307,16 @@
 
     <script>
         function enterApp() {
+            console.log('Enter app clicked');
             // Store that user has seen the welcome page
             localStorage.setItem('hasSeenWelcome', 'true');
+            console.log('hasSeenWelcome set to true');
             // Navigate to the main app
-            window.location.href = '/app';
+            // Check if we're in development or production
+            const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const appUrl = isDevelopment ? '/' : '/app';
+            console.log('Navigating to:', appUrl);
+            window.location.href = appUrl;
         }
 
         function scrollToFeatures() {

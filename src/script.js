@@ -3,6 +3,7 @@
 
 export class FormGenerator {
     constructor() {
+        console.log('FormGenerator constructor called');
         this.questionCounter = 0;
         
         // Load configuration from environment variables
@@ -12,14 +13,81 @@ export class FormGenerator {
         this.cacheBusting = import.meta.env.VITE_CACHE_BUSTING !== 'false';
         
         console.log('Configuration loaded from environment variables');
+        console.log('Current URL:', window.location.href);
         
         this.init();
     }
 
     // Initialize the application
     init() {
-        this.bindEvents();
-        this.addQuestion(); // Add first question by default
+        console.log('Initializing FormGenerator...');
+        try {
+            this.bindEvents();
+            console.log('Events bound successfully');
+            this.addQuestion(); // Add first question by default
+            console.log('First question added');
+            this.initDragAndDrop(); // Initialize drag and drop functionality
+            console.log('Drag and drop initialized');
+            console.log('FormGenerator initialization complete');
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
+    }
+
+    // Initialize drag and drop functionality
+    initDragAndDrop() {
+        const questionsContainer = document.getElementById('questionsContainer');
+        
+        // Add drag and drop event listeners
+        questionsContainer.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('question-item')) {
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/html', e.target.outerHTML);
+            }
+        });
+
+        questionsContainer.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('question-item')) {
+                e.target.classList.remove('dragging');
+            }
+        });
+
+        questionsContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const draggingElement = document.querySelector('.dragging');
+            if (!draggingElement) return;
+
+            const afterElement = this.getDragAfterElement(questionsContainer, e.clientY);
+            if (afterElement) {
+                questionsContainer.insertBefore(draggingElement, afterElement);
+            } else {
+                questionsContainer.appendChild(draggingElement);
+            }
+        });
+
+        questionsContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.updateQuestionNumbers();
+        });
+    }
+
+    // Helper function to determine drop position
+    getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.question-item:not(.dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
     // Bind all event listeners
@@ -32,11 +100,6 @@ export class FormGenerator {
         // Generate questions button
         document.getElementById('generateQuestionsBtn').addEventListener('click', () => {
             this.generateQuestionsFromTitle();
-        });
-
-        // Shuffle questions button
-        document.getElementById('shuffleQuestionsBtn').addEventListener('click', () => {
-            this.shuffleQuestions();
         });
 
         // Add more questions button
@@ -230,6 +293,18 @@ export class FormGenerator {
         
         // Set question number
         questionElement.querySelector('.question-number').textContent = this.questionCounter;
+        
+        // Make question draggable
+        const questionDiv = questionElement.querySelector('.question-item');
+        questionDiv.draggable = true;
+        questionDiv.classList.add('cursor-move');
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.className = 'drag-handle text-gray-400 hover:text-gray-600 cursor-move';
+        dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
+        dragHandle.title = 'Drag to reorder';
+        questionDiv.appendChild(dragHandle);
         
         // Add to container
         document.getElementById('questionsContainer').appendChild(questionElement);
@@ -797,7 +872,10 @@ export class FormGenerator {
                 // Clear the flag so user sees welcome page again
                 localStorage.removeItem('hasSeenWelcome');
                 // Navigate to welcome page
-                window.location.href = '/';
+                // Check if we're in development or production
+                const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const welcomeUrl = isDevelopment ? '/welcome.html' : '/';
+                window.location.href = welcomeUrl;
             }
         });
     }
@@ -858,31 +936,23 @@ export class FormGenerator {
             this.updateOptionsDisplay(questionElement);
         }
         
+        // Make question draggable
+        const questionDiv = questionElement.querySelector('.question-item');
+        questionDiv.draggable = true;
+        questionDiv.classList.add('cursor-move');
+        
+        // Add drag handle
+        const dragHandle = document.createElement('div');
+        dragHandle.className = 'drag-handle text-gray-400 hover:text-gray-600 cursor-move';
+        dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
+        dragHandle.title = 'Drag to reorder';
+        questionDiv.appendChild(dragHandle);
+        
         // Add to container
         document.getElementById('questionsContainer').appendChild(questionElement);
     }
 
-    // Shuffle questions
-    shuffleQuestions() {
-        const questionsContainer = document.getElementById('questionsContainer');
-        const questions = Array.from(questionsContainer.children);
-        
-        if (questions.length < 2) {
-            Swal.fire('Info', 'Need at least 2 questions to shuffle', 'info');
-            return;
-        }
 
-        // Fisher-Yates shuffle algorithm
-        for (let i = questions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            questionsContainer.appendChild(questions[j]);
-        }
-
-        // Update question numbers
-        this.updateQuestionNumbers();
-        
-        Swal.fire('Success!', 'Questions shuffled successfully', 'success');
-    }
 
     // Add more questions based on existing ones
     async addMoreQuestions() {
@@ -950,21 +1020,31 @@ export class FormGenerator {
                 try {
                     const questions = JSON.parse(generatedText);
                     
-                    // Add new questions
+                    // Add new questions to existing ones (don't clear)
                     questions.forEach(questionData => {
                         this.addQuestionWithData(questionData);
                     });
                     
                     Swal.fire('Success!', `Added ${questions.length} more questions`, 'success');
                 } catch (parseError) {
-                    this.parseQuestionsFromText(generatedText, formTitle);
+                    // If JSON parsing fails, create some default questions
+                    const defaultQuestions = this.generateDefaultQuestions(formTitle);
+                    defaultQuestions.slice(0, 3).forEach(questionData => {
+                        this.addQuestionWithData(questionData);
+                    });
+                    Swal.fire('Info', `Added 3 default questions for "${formTitle}"`, 'info');
                 }
             } else {
                 throw new Error('Invalid response from Gemini API');
             }
         } catch (error) {
             console.error('Error adding more questions:', error);
-            Swal.fire('Error', 'Failed to add more questions. Please try again.', 'error');
+            // Fallback: add 3 default questions
+            const defaultQuestions = this.generateDefaultQuestions(formTitle);
+            defaultQuestions.slice(0, 3).forEach(questionData => {
+                this.addQuestionWithData(questionData);
+            });
+            Swal.fire('Info', `Added 3 default questions for "${formTitle}"`, 'info');
         } finally {
             // Restore button state
             addMoreBtn.innerHTML = originalText;
