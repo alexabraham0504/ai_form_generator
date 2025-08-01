@@ -310,7 +310,7 @@
             // Store that user has seen the welcome page
             localStorage.setItem('hasSeenWelcome', 'true');
             // Navigate to the main app
-            window.location.href = 'index.html';
+            window.location.href = '/app';
         }
 
         function scrollToFeatures() {
@@ -318,15 +318,6 @@
                 behavior: 'smooth' 
             });
         }
-
-        // Check if user has already seen welcome page
-        window.addEventListener('load', function() {
-            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
-            if (hasSeenWelcome === 'true') {
-                // Skip welcome page and go directly to app
-                window.location.href = 'index.html';
-            }
-        });
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {

@@ -797,7 +797,7 @@ export class FormGenerator {
                 // Clear the flag so user sees welcome page again
                 localStorage.removeItem('hasSeenWelcome');
                 // Navigate to welcome page
-                window.location.href = 'welcome.html';
+                window.location.href = '/';
             }
         });
     }

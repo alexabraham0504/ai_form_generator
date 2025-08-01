@@ -31,6 +31,11 @@ app.get('/welcome.html', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'welcome.html'));
 });
 
+// Serve index.html at /app path
+app.get('/app', (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'index.html'));
+});
+
 // Handle all other routes by serving index.html (for SPA routing)
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
