@@ -1112,8 +1112,8 @@
 
             // Simple list of questions with drag functionality
             const questionsHTML = questions.map((q, index) => `
-                <div class="question-item bg-white/90 rounded-xl p-4 border border-gray-300 hover:border-gray-400 transition-all mb-4 relative" draggable="true" style="background: rgba(255, 255, 255, 0.95);">
-                    <div class="drag-handle absolute top-3 right-12 text-gray-600 hover:text-gray-800 cursor-move">
+                <div class="question-item bg-white/10 rounded-xl p-4 border border-white/20 hover:border-white/30 transition-all mb-4 relative" draggable="true">
+                    <div class="drag-handle absolute top-3 right-12 text-white/60 hover:text-white/80 cursor-move">
                         <i class="fas fa-grip-vertical"></i>
                     </div>
                     <div class="flex justify-between items-start">
@@ -1122,22 +1122,22 @@
                                 <div class="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
                                     <span class="question-number text-white font-bold text-xs">${index + 1}</span>
                                 </div>
-                                <h4 class="text-gray-900 font-semibold text-base" style="color: black !important; font-weight: 600;">${q.text}</h4>
+                                <h4 class="text-white font-semibold text-base">${q.text}</h4>
                             </div>
                             <div class="flex items-center space-x-3 mb-2">
-                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium" style="color: #1e40af !important;">${q.type}</span>
-                                ${q.options.length > 0 ? `<span class="text-gray-600 text-xs">${q.options.length} options</span>` : ''}
+                                <span class="px-2 py-1 bg-white/20 text-white rounded-full text-xs font-medium">${q.type}</span>
+                                ${q.options.length > 0 ? `<span class="text-white/60 text-xs">${q.options.length} options</span>` : ''}
                             </div>
                             ${q.options.length > 0 ? `
-                                <div class="bg-gray-50 rounded-lg p-3" style="background: rgba(249, 250, 251, 0.8);">
-                                    <p class="text-gray-700 text-xs font-medium mb-2">Options:</p>
+                                <div class="bg-white/5 rounded-lg p-3">
+                                    <p class="text-white/70 text-xs font-medium mb-2">Options:</p>
                                     <div class="flex flex-wrap gap-1">
-                                        ${q.options.map(option => `<span class="px-2 py-1 bg-white text-gray-800 rounded text-xs border border-gray-200">${option}</span>`).join('')}
+                                        ${q.options.map(option => `<span class="px-2 py-1 bg-white/10 text-white rounded text-xs">${option}</span>`).join('')}
                                     </div>
                                 </div>
                             ` : ''}
                         </div>
-                        <button onclick="removeQuestion(${index})" class="text-red-500 hover:text-red-700 transition-colors ml-2 p-1 hover:bg-red-100 rounded-lg">
+                        <button onclick="removeQuestion(${index})" class="text-red-400 hover:text-red-300 transition-colors ml-2 p-1 hover:bg-red-500/20 rounded-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
