@@ -15,7 +15,7 @@ yarn-error.log*
 env.example
 
 # Build outputs
-dist/
+
 out/
 
 # IDE and Editor files
