@@ -413,7 +413,7 @@
             </div>
         </div>
 
-        <div id="formPreviewSection" class="bg-white rounded-lg shadow-lg p-8 border border-gray-200 hidden">
+        <div id="formPreviewSection" class="glass rounded-lg shadow-lg p-8 border border-white/20 hidden">
             <div class="flex items-center mb-8">
                 <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-4">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -421,13 +421,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                 </div>
-                <h2 class="text-3xl font-bold text-gray-900">Questions List</h2>
+                <h2 class="text-3xl font-bold text-white">Questions List</h2>
             </div>
             
             <div id="questionsPreview" class="space-y-4 mb-8">
-                <div class="text-gray-500 text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="text-white/70 text-center py-12">
+                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
@@ -1112,7 +1112,7 @@
 
             // Simple list of questions with drag functionality
             const questionsHTML = questions.map((q, index) => `
-                <div class="question-item bg-white/10 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all mb-4 relative" draggable="true">
+                <div class="question-item bg-white/10 rounded-xl p-4 border border-white/20 hover:border-white/30 transition-all mb-4 relative" draggable="true">
                     <div class="drag-handle absolute top-3 right-12 text-white/60 hover:text-white/80 cursor-move">
                         <i class="fas fa-grip-vertical"></i>
                     </div>
@@ -2437,6 +2437,8 @@ For text questions (Short Answer, Paragraph), use empty options array: []`;
                 }
             });
         });
+
+        setOptionMethod('manual');
     </script>
 </body>
 </html>
