@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "npm run build && node server.js",
     "build": "node build.js",
     "start": "node server.js",
     "deploy": "npm run build && echo 'Build complete! Deploy the dist folder to your hosting service.'"
