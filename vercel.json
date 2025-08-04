@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/welcome.html"
+    },
+    {
+      "src": "/app",
+      "dest": "/index2.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/welcome.html"
+    }
+  ]
+} 

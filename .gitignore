@@ -1,0 +1,106 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+# Environment variables (CRITICAL - Never commit API keys!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+env.example
+
+# Build outputs
+dist/
+out/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Temporary folders
+tmp/
+temp/
+.tmp/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.vite/
+
+# Local development
+.local/
+.localhost/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Test files
+test-results/
+coverage/
+
+# Google Apps Script specific
+.clasp.json
+.clasprc.json
+
+# API Keys and Secrets (EXTRA SECURITY)
+*api-key*
+*secret*
+*token*
+*password*
+*credential*
+
+# Personal configuration files
+config.local.js
+settings.local.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar
+
+# Documentation build
+docs/build/ 
+.vercel

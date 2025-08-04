@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - AI-Powered Form Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Full-Screen Carousel Styles */
+        .carousel-section {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+            width: 100%;
+            background: white;
+        }
+        
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .carousel-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .carousel-slide.prev {
+            transform: translateX(-100%);
+        }
+        
+        .carousel-content {
+            text-align: center;
+            max-width: 800px;
+            color: #1e293b;
+        }
+        
+        .carousel-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @media (min-width: 640px) {
+            .carousel-icon {
+                font-size: 6rem;
+                margin-bottom: 2rem;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .carousel-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        .carousel-description {
+            font-size: 1rem;
+            color: #64748b;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 640px) {
+            .carousel-title {
+                font-size: 3.5rem;
+                margin-bottom: 2rem;
+            }
+            
+            .carousel-description {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .carousel-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(100, 100, 100, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .carousel-dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-3 sm:py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-robot text-xl sm:text-2xl text-indigo-600 mr-2 sm:mr-3"></i>
+                    <h1 class="text-lg sm:text-xl font-bold text-gray-900">AI Form Generator</h1>
+                </div>
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <a href="#features" class="text-gray-600 hover:text-indigo-600 transition-colors text-sm sm:text-base hidden sm:block">Features</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-indigo-600 transition-colors text-sm sm:text-base hidden sm:block">How It Works</a>
+                    <button onclick="enterApp()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg transition-colors text-sm sm:text-base">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-12 sm:py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-float mb-6 sm:mb-8">
+                <i class="fas fa-magic text-4xl sm:text-6xl mb-3 sm:mb-4"></i>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">Create Smart Forms with AI</h1>
+            <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
+                Transform your ideas into professional Google Forms instantly. Our AI generates relevant questions, 
+                provides split-screen organization, and creates synthetic test data with controlled sentiment.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
+                <button onclick="enterApp()" class="bg-white text-indigo-600 hover:bg-gray-100 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Start Creating
+                </button>
+                <button onclick="scrollToFeatures()" class="border-2 border-white text-white hover:bg-white hover:text-indigo-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Learn More
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Full-Screen Interactive Carousel Section -->
+    <section class="carousel-section">
+        <div class="carousel-container">
+
+            <!-- Slide 1: Split-Screen Interface -->
+            <div class="carousel-slide active" data-slide="0">
+                <div class="carousel-content">
+                    <div class="carousel-icon text-indigo-600">
+                        <i class="fas fa-columns"></i>
+                    </div>
+                    <h3 class="carousel-title">Split-Screen Interface</h3>
+                    <p class="carousel-description">
+                        Left side for manual question building, right side for AI-generated questions. 
+                        Drag and drop to reorder, shuffle questions, and organize your form efficiently.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Slide 2: AI Question Generation -->
+            <div class="carousel-slide" data-slide="1">
+                <div class="carousel-content">
+                    <div class="carousel-icon text-purple-600">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="carousel-title">AI Question Generation</h3>
+                    <p class="carousel-description">
+                        Simply enter your form title and let AI generate relevant, diverse questions automatically. 
+                        Add more questions anytime with the "Add More" button.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Slide 3: Synthetic Response Generation -->
+            <div class="carousel-slide" data-slide="2">
+                <div class="carousel-content">
+                    <div class="carousel-icon text-green-600">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="carousel-title">Synthetic Response Testing</h3>
+                    <p class="carousel-description">
+                        Generate fake responses with controlled sentiment (positive/neutral/negative). 
+                        Perfect for testing forms and creating sample data instantly.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Slide 4: Smart Question Management -->
+            <div class="carousel-slide" data-slide="3">
+                <div class="carousel-content">
+                    <div class="carousel-icon text-blue-600">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <h3 class="carousel-title">Smart Question Management</h3>
+                    <p class="carousel-description">
+                        Shuffle generated questions, drag to reorder, edit existing ones, and move questions 
+                        between manual and generated sections seamlessly.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Slide 5: Google Forms Integration -->
+            <div class="carousel-slide" data-slide="4">
+                <div class="carousel-content">
+                    <div class="carousel-icon text-red-600">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <h3 class="carousel-title">Google Forms Integration</h3>
+                    <p class="carousel-description">
+                        Instantly create real Google Forms with your questions. Get a shareable link 
+                        and start collecting responses immediately.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Navigation dots -->
+            <div class="carousel-nav">
+                <div class="carousel-dot active" onclick="goToSlide(0)"></div>
+                <div class="carousel-dot" onclick="goToSlide(1)"></div>
+                <div class="carousel-dot" onclick="goToSlide(2)"></div>
+                <div class="carousel-dot" onclick="goToSlide(3)"></div>
+                <div class="carousel-dot" onclick="goToSlide(4)"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Everything you need to create professional forms in minutes
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Split-Screen Interface -->
+                <div class="feature-card bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-indigo-600 mb-4">
+                        <i class="fas fa-columns text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Split-Screen Interface</h3>
+                    <p class="text-gray-600">
+                        Left side for manual question building, right side for AI-generated questions. 
+                        Drag and drop to reorder, shuffle questions, and organize your form efficiently.
+                    </p>
+                </div>
+
+                <!-- AI Question Generation -->
+                <div class="feature-card bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-purple-600 mb-4">
+                        <i class="fas fa-brain text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">AI Question Generation</h3>
+                    <p class="text-gray-600">
+                        Simply enter your form title and let AI generate relevant, diverse questions automatically. 
+                        Add more questions anytime with the "Add More" button.
+                    </p>
+                </div>
+
+                <!-- Synthetic Response Generation -->
+                <div class="feature-card bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-green-600 mb-4">
+                        <i class="fas fa-users text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Synthetic Response Generation</h3>
+                    <p class="text-gray-600">
+                        Generate fake responses with controlled sentiment (positive/neutral/negative). 
+                        Perfect for testing forms and creating sample data instantly.
+                    </p>
+                </div>
+
+                <!-- Smart Question Management -->
+                <div class="feature-card bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-blue-600 mb-4">
+                        <i class="fas fa-random text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Smart Question Management</h3>
+                    <p class="text-gray-600">
+                        Shuffle generated questions, drag to reorder, edit existing ones, and move questions 
+                        between manual and generated sections seamlessly.
+                    </p>
+                </div>
+
+                <!-- Multiple Question Types -->
+                <div class="feature-card bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-yellow-600 mb-4">
+                        <i class="fas fa-list-ul text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Multiple Question Types</h3>
+                    <p class="text-gray-600">
+                        Support for short answers, paragraphs, multiple choice, checkboxes, and dropdowns. 
+                        AI automatically suggests appropriate question types and options.
+                    </p>
+                </div>
+
+                <!-- Google Forms Integration -->
+                <div class="feature-card bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-red-600 mb-4">
+                        <i class="fab fa-google text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Google Forms Integration</h3>
+                    <p class="text-gray-600">
+                        Instantly create real Google Forms with your questions. Get a shareable link 
+                        and start collecting responses immediately.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Create professional forms in just 5 simple steps
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="bg-indigo-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        1
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Enter Form Title</h3>
+                    <p class="text-gray-600">
+                        Type your form title and let AI understand what kind of form you want to create.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="bg-purple-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        2
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Generate Questions</h3>
+                    <p class="text-gray-600">
+                        Click "Generate Questions" and AI creates relevant questions on the right side.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="bg-green-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        3
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Build & Organize</h3>
+                    <p class="text-gray-600">
+                        Add manual questions on the left, shuffle generated questions, and organize your form.
+                    </p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="text-center">
+                    <div class="bg-blue-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        4
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Test with Synthetic Data</h3>
+                    <p class="text-gray-600">
+                        Generate fake responses with controlled sentiment to test your form instantly.
+                    </p>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="text-center">
+                    <div class="bg-red-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                        5
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Create & Share</h3>
+                    <p class="text-gray-600">
+                        Generate your Google Form and get a shareable link to start collecting responses.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Perfect For</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Ideal for various use cases and industries
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Business -->
+                <div class="text-center p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl">
+                    <i class="fas fa-briefcase text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Business & Marketing</h3>
+                    <ul class="text-gray-600 text-left space-y-2">
+                        <li>• Customer feedback surveys</li>
+                        <li>• Market research</li>
+                        <li>• Employee satisfaction</li>
+                        <li>• Product testing</li>
+                    </ul>
+                </div>
+
+                <!-- Education -->
+                <div class="text-center p-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                    <i class="fas fa-graduation-cap text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Education</h3>
+                    <ul class="text-gray-600 text-left space-y-2">
+                        <li>• Student evaluations</li>
+                        <li>• Course feedback</li>
+                        <li>• Event registrations</li>
+                        <li>• Research surveys</li>
+                    </ul>
+                </div>
+
+                <!-- Events -->
+                <div class="text-center p-8 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
+                    <i class="fas fa-calendar-alt text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Events & Social</h3>
+                    <ul class="text-gray-600 text-left space-y-2">
+                        <li>• Event registrations</li>
+                        <li>• RSVP forms</li>
+                        <li>• Preference surveys</li>
+                        <li>• Feedback collection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-6">Ready to Create Your First AI-Powered Form?</h2>
+            <p class="text-xl mb-8">
+                Experience the new split-screen interface, AI question generation, and instant synthetic response testing.
+            </p>
+            <button onclick="enterApp()" class="bg-white text-indigo-600 hover:bg-gray-100 px-10 py-4 rounded-lg font-semibold text-lg transition-colors">
+                <i class="fas fa-rocket mr-2"></i>
+                Start Creating Now
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <i class="fas fa-robot text-2xl text-indigo-400 mr-3"></i>
+                    <h3 class="text-xl font-bold">AI-Powered Form Generator</h3>
+                </div>
+                <p class="text-gray-400 mb-4">
+                    Create professional Google Forms with the power of AI
+                </p>
+                <div class="flex justify-center space-x-6 text-gray-400">
+                    <a href="#" class="hover:text-white transition-colors">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:text-white transition-colors">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="hover:text-white transition-colors">
+                        <i class="fas fa-envelope text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Carousel functionality
+        let currentSlide = 0;
+        let autoPlayInterval;
+        const totalSlides = 5;
+        
+        function showSlide(slideIndex) {
+            // Hide all slides
+            document.querySelectorAll('.carousel-slide').forEach(slide => {
+                slide.classList.remove('active', 'prev');
+            });
+            
+            // Remove active class from all dots
+            document.querySelectorAll('.carousel-dot').forEach(dot => {
+                dot.classList.remove('active');
+            });
+            
+            // Show current slide
+            const currentSlideElement = document.querySelector(`[data-slide="${slideIndex}"]`);
+            if (currentSlideElement) {
+                currentSlideElement.classList.add('active');
+            }
+            
+            // Show previous slide for animation
+            const prevIndex = slideIndex === 0 ? totalSlides - 1 : slideIndex - 1;
+            const prevSlideElement = document.querySelector(`[data-slide="${prevIndex}"]`);
+            if (prevSlideElement) {
+                prevSlideElement.classList.add('prev');
+            }
+            
+            // Activate current dot
+            const currentDot = document.querySelectorAll('.carousel-dot')[slideIndex];
+            if (currentDot) {
+                currentDot.classList.add('active');
+            }
+            
+            currentSlide = slideIndex;
+        }
+        
+        function nextSlide() {
+            const nextIndex = (currentSlide + 1) % totalSlides;
+            showSlide(nextIndex);
+        }
+        
+        function prevSlide() {
+            const prevIndex = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+            showSlide(prevIndex);
+        }
+        
+        function goToSlide(slideIndex) {
+            showSlide(slideIndex);
+            resetAutoPlay();
+        }
+        
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(() => {
+                nextSlide();
+            }, 4000); // Change slide every 4 seconds
+        }
+        
+        function resetAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                startAutoPlay();
+            }
+        }
+        
+        function enterApp() {
+            console.log('Enter app clicked');
+            window.location.href = '/app';
+        }
+
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Start auto-play when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            startAutoPlay();
+        });
+    </script>
+</body>
+</html> 
