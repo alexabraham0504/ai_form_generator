@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Apps Script Deployment Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Google Apps Script Deployment Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test URL Configuration</h2>
+        <p>Current URL: <code id="currentUrl"></code></p>
+        <button onclick="testUrl()">Test URL</button>
+        <div id="urlResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test Simple Form Creation</h2>
+        <button onclick="testSimpleForm()">Create Test Form</button>
+        <div id="simpleFormResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test Complex Form Creation</h2>
+        <button onclick="testComplexForm()">Create Complex Form</button>
+        <div id="complexFormResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Manual URL Test</h2>
+        <p>Enter your Apps Script URL:</p>
+        <input type="text" id="customUrl" placeholder="https://script.google.com/macros/s/..." style="width: 100%; padding: 10px; margin: 10px 0;">
+        <button onclick="testCustomUrl()">Test Custom URL</button>
+        <div id="customUrlResult"></div>
+    </div>
+
+    <script>
+        // Replace this with your actual Google Apps Script URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylw0vtssJ79gn31z8qwBiCeXIPIJBb95HzHjvBakGZmWLzYJFz74gncnUirkSP09pPLQ/exec';
+        
+        document.getElementById('currentUrl').textContent = GOOGLE_SCRIPT_URL;
+        
+        async function testUrl() {
+            const resultDiv = document.getElementById('urlResult');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ URL is accessible</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Response:</p>
+                            <pre>${text.substring(0, 500)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ URL returned error</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Status Text: ${response.statusText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network error</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>This usually means the URL is incorrect or the script is not deployed properly.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testSimpleForm() {
+            const resultDiv = document.getElementById('simpleFormResult');
+            resultDiv.innerHTML = '<p>Creating simple form...</p>';
+            
+            const testData = {
+                title: "Test Form " + Date.now(),
+                questions: [
+                    {
+                        text: "What is your name?",
+                        title: "What is your name?",
+                        type: "Short Answer",
+                        options: []
+                    }
+                ]
+            };
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h3>✅ Form created successfully!</h3>
+                                <p><strong>Form URL:</strong> <a href="${result.formUrl}" target="_blank">${result.formUrl}</a></p>
+                                <p><strong>Form ID:</strong> ${result.formId}</p>
+                                <p><strong>Edit URL:</strong> <a href="${result.editUrl}" target="_blank">${result.editUrl}</a></p>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Form creation failed</h3>
+                                <p>Error: ${result.error}</p>
+                                <pre>${result.stack || ''}</pre>
+                            </div>
+                        `;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ HTTP Error</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Response: ${errorText.substring(0, 500)}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network error</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testComplexForm() {
+            const resultDiv = document.getElementById('complexFormResult');
+            resultDiv.innerHTML = '<p>Creating complex form...</p>';
+            
+            const testData = {
+                title: "Complex Test Form " + Date.now(),
+                questions: [
+                    {
+                        text: "What is your name?",
+                        title: "What is your name?",
+                        type: "Short Answer",
+                        options: []
+                    },
+                    {
+                        text: "Tell us about yourself",
+                        title: "Tell us about yourself",
+                        type: "Paragraph",
+                        options: []
+                    },
+                    {
+                        text: "What is your favorite color?",
+                        title: "What is your favorite color?",
+                        type: "Multiple Choice",
+                        options: ["Red", "Blue", "Green", "Yellow"]
+                    },
+                    {
+                        text: "Which programming languages do you know?",
+                        title: "Which programming languages do you know?",
+                        type: "Checkboxes",
+                        options: ["JavaScript", "Python", "Java", "C++", "Go"]
+                    },
+                    {
+                        text: "Select your experience level",
+                        title: "Select your experience level",
+                        type: "Dropdown",
+                        options: ["Beginner", "Intermediate", "Advanced", "Expert"]
+                    }
+                ]
+            };
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        resultDiv.innerHTML = `
+                            <div class="success">
+                                <h3>✅ Complex form created successfully!</h3>
+                                <p><strong>Form URL:</strong> <a href="${result.formUrl}" target="_blank">${result.formUrl}</a></p>
+                                <p><strong>Form ID:</strong> ${result.formId}</p>
+                                <p><strong>Edit URL:</strong> <a href="${result.editUrl}" target="_blank">${result.editUrl}</a></p>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Complex form creation failed</h3>
+                                <p>Error: ${result.error}</p>
+                                <pre>${result.stack || ''}</pre>
+                            </div>
+                        `;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ HTTP Error</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Response: ${errorText.substring(0, 500)}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network error</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testCustomUrl() {
+            const customUrl = document.getElementById('customUrl').value.trim();
+            if (!customUrl) {
+                alert('Please enter a URL to test');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('customUrlResult');
+            resultDiv.innerHTML = '<p>Testing custom URL...</p>';
+            
+            try {
+                const response = await fetch(customUrl, {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Custom URL is accessible</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Response:</p>
+                            <pre>${text.substring(0, 500)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Custom URL returned error</h3>
+                            <p>Status: ${response.status}</p>
+                            <p>Status Text: ${response.statusText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Network error</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 
